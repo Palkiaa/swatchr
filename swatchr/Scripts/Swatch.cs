@@ -41,12 +41,15 @@ namespace swatchr {
 			return null;
 	}
 		public event EventHandler OnSwatchChanged {
-			add { _event.Add(value); }
-			remove { _event.Remove(value); }
+			//add { _event.Add(value); }
+			//remove { _event.Remove(value); }
+			add { _event += value; }
+			remove { _event -= value; }
 		}
 
 		[NonSerialized]
-		private FastSmartWeakEvent<EventHandler> _event = new FastSmartWeakEvent<EventHandler>();
+		//private FastSmartWeakEvent<EventHandler> _event = new FastSmartWeakEvent<EventHandler>();
+		private EventHandler _event;
 
 		public Color GetColor(int colorIndex) {
 			if (colors == null || colors.Length <= colorIndex || colorIndex < 0) {
@@ -102,10 +105,11 @@ namespace swatchr {
 
 		public void SignalChange() {
 			RegenerateTexture();
-			_event.Raise(this, EventArgs.Empty);
-			#if UNITY_EDITOR
+			//_event.Raise(this, EventArgs.Empty);
+			_event.Invoke(this, EventArgs.Empty);
+#if UNITY_EDITOR
 			UnityEditor.EditorUtility.SetDirty(this);
-			#endif
+#endif
 		}
 
 	}

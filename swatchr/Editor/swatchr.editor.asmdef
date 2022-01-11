@@ -1,0 +1,16 @@
+{
+    "name": "swatchr.editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:1d324f2e26cedc74695ff662cb2eb505"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

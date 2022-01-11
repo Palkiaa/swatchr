@@ -1,15 +1,12 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
+
+using UnityEngine;
 
 namespace swatchr
 {
-
     [CustomPropertyDrawer(typeof(SwatchrColor))]
     public class SwatchrColorDrawer : PropertyDrawer
     {
-
         private Texture2D swatchTexture;
         private Texture2D palleteTexture;
         private int palleteTextureCachedHash;
@@ -58,11 +55,8 @@ namespace swatchr
 
             EditorGUI.BeginProperty(position, label, property);
 
-
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
-
-
 
             // Draw Swatch object
             EditorGUI.BeginChangeCheck();
@@ -128,7 +122,6 @@ namespace swatchr
                     {
                         paletteOpen = false;
                         EditorUtility.SetDirty(property.serializedObject.targetObject); // Repaint
-
                     }
                 }
             }
@@ -158,7 +151,7 @@ namespace swatchr
             }
         }
 
-        Texture2D textureWithColor(Color color)
+        private Texture2D textureWithColor(Color color)
         {
             var tex = new Texture2D(1, 1, TextureFormat.RGB24, false, true);
             tex.filterMode = FilterMode.Point;
@@ -169,7 +162,7 @@ namespace swatchr
             return tex;
         }
 
-        Texture2D textureWithColors(Color[] colors)
+        private Texture2D textureWithColors(Color[] colors)
         {
             int itemsPerRow = 5;
             // figure out our texture size based on the itemsPerRow and color count
@@ -196,7 +189,7 @@ namespace swatchr
             return tex;
         }
 
-        void DrawBlackGrid(float startingPointX, float startingPointY, int cellsX, int cellsY, int cellSize)
+        private void DrawBlackGrid(float startingPointX, float startingPointY, int cellsX, int cellsY, int cellSize)
         {
             if (blackTexture == null)
             {
@@ -227,8 +220,9 @@ namespace swatchr
             }
         }
 
-        GUIStyle tempDrawTextureStyle;
-        void DrawTexture(Texture2D texture, Rect rect)
+        private GUIStyle tempDrawTextureStyle;
+
+        private void DrawTexture(Texture2D texture, Rect rect)
         {
             if (tempDrawTextureStyle == null)
             {
@@ -238,27 +232,27 @@ namespace swatchr
             EditorGUI.LabelField(rect, "", tempDrawTextureStyle);
         }
 
-        bool DrawTextureButton(Texture2D texture, Rect rect)
+        private bool DrawTextureButton(Texture2D texture, Rect rect)
         {
             bool buttonPressed = GUI.Button(rect, "", GUIStyle.none);
             DrawTexture(texture, rect);
             return buttonPressed;
         }
 
-        void UpdateActiveSwatch(Color color)
+        private void UpdateActiveSwatch(Color color)
         {
             swatchTexture.SetPixel(0, 0, color);
             swatchTexture.Apply();
             SwatchEditorGUI.GameViewRepaint();
         }
 
-        bool IsClick()
+        private bool IsClick()
         {
             Event e = Event.current;
             return e != null && e.type == EventType.MouseDown && e.button == 0;
         }
 
-        bool IsClickInRect(Rect rect)
+        private bool IsClickInRect(Rect rect)
         {
             Event e = Event.current;
             return e != null && e.type == EventType.MouseDown && e.button == 0 && rect.Contains(e.mousePosition);

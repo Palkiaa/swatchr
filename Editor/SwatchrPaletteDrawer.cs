@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
+
+using UnityEngine;
 
 namespace swatchr
 {
@@ -10,7 +9,9 @@ namespace swatchr
         public SwatchrPaletteDrawer()
         {
         }
+
         public const int itemsPerRow = 8;
+
         public static bool DrawColorPallete(Swatch swatch, ref int colorKey, bool drawNewColorButton)
         {
             if (swatch == null)
@@ -123,7 +124,6 @@ namespace swatchr
                     }
                     else
                     {
-
                     }
                 }
             }
@@ -182,7 +182,7 @@ namespace swatchr
             return r;
         }
 
-        static void DrawBlackGrid(float startingPointX, float startingPointY, int numColors, int cellsX, int cellsY, int cellSize, Texture2D colorTexture)
+        private static void DrawBlackGrid(float startingPointX, float startingPointY, int numColors, int cellsX, int cellsY, int cellSize, Texture2D colorTexture)
         {
             if (cellsX == 0 && cellsY == 0)
             {
@@ -222,7 +222,7 @@ namespace swatchr
             }
         }
 
-        static void DrawOnSelectedCell(int selectedCell, Rect textureRect)
+        private static void DrawOnSelectedCell(int selectedCell, Rect textureRect)
         {
             int selectedCellY = selectedCell / itemsPerRow;
             int selectedCellX = selectedCell - (itemsPerRow * selectedCellY);
@@ -231,7 +231,7 @@ namespace swatchr
             DrawBlackGrid(smallBlackRect.x, smallBlackRect.y, 1, 1, 1, (int)(EditorGUIUtility.singleLineHeight), whiteTexture);
         }
 
-        static void DrawNewColorButton(int selectedCell, Rect textureRect)
+        private static void DrawNewColorButton(int selectedCell, Rect textureRect)
         {
             int selectedCellY = selectedCell / itemsPerRow;
             int selectedCellX = selectedCell - (itemsPerRow * selectedCellY);
@@ -250,12 +250,13 @@ namespace swatchr
             DrawTexture(blackTexture, plusHorizontalRect);
         }
 
-        static GUIStyle tempDrawTextureStyle;
-        static Texture2D blackTexture;
-        static Texture2D whiteTexture;
-        static Texture2D palleteTexture;
-        static int palleteTextureCachedHashCode;
-        static void DrawTexture(Texture2D texture, Rect rect)
+        private static GUIStyle tempDrawTextureStyle;
+        private static Texture2D blackTexture;
+        private static Texture2D whiteTexture;
+        private static Texture2D palleteTexture;
+        private static int palleteTextureCachedHashCode;
+
+        private static void DrawTexture(Texture2D texture, Rect rect)
         {
             if (tempDrawTextureStyle == null)
             {
@@ -265,18 +266,19 @@ namespace swatchr
             EditorGUI.LabelField(rect, "", tempDrawTextureStyle);
         }
 
-        static bool IsClick()
+        private static bool IsClick()
         {
             Event e = Event.current;
             return e != null && e.type == EventType.MouseDown && e.button == 0;
         }
 
-        static bool IsClickInRect(Rect rect)
+        private static bool IsClickInRect(Rect rect)
         {
             Event e = Event.current;
             return e != null && e.type == EventType.MouseDown && e.button == 0 && rect.Contains(e.mousePosition);
         }
-        static Texture2D textureWithColor(Color color)
+
+        private static Texture2D textureWithColor(Color color)
         {
             var tex = new Texture2D(1, 1, TextureFormat.RGB24, false, true);
             tex.filterMode = FilterMode.Point;
@@ -287,7 +289,7 @@ namespace swatchr
             return tex;
         }
 
-        static Texture2D textureWithColors(Color[] colors)
+        private static Texture2D textureWithColors(Color[] colors)
         {
             if (colors == null || colors.Length == 0)
             {

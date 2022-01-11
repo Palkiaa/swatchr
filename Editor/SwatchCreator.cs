@@ -1,14 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.IO;
+
 using UnityEditor;
-using System.IO;
+
+using UnityEngine;
 
 namespace swatchr
 {
     public static class SwatchCreator
     {
-
         [MenuItem("Assets/Swatchr/Create New Swatch")]
         public static void CreateSwatch()
         {
@@ -38,6 +37,7 @@ namespace swatchr
             asset.AddColorsFromOtherSwatch(activeObject);
             ProjectWindowUtil.CreateAsset(asset, activeObject.name + ".asset");
         }
+
         [MenuItem("Assets/Swatchr/Duplicate Swatch", true)]
         public static bool ValidateDuplicateSwatch()
         {
@@ -60,7 +60,7 @@ namespace swatchr
         }
 
         [MenuItem("Assets/Swatchr/Import ASE File")]
-        static void ImportSelectedASEFile()
+        private static void ImportSelectedASEFile()
         {
             var activeObject = Selection.activeObject;
             var path = AssetDatabase.GetAssetPath(activeObject.GetInstanceID());
@@ -72,7 +72,7 @@ namespace swatchr
         }
 
         [MenuItem("Assets/Swatchr/Import ASE File", true)]
-        static bool ValidateImportSelectedASEFile()
+        private static bool ValidateImportSelectedASEFile()
         {
             var activeObject = Selection.activeObject;
             if (activeObject == null)
@@ -84,7 +84,7 @@ namespace swatchr
         }
 
         [MenuItem("Assets/Swatchr/Import ASE File (Browse...)")]
-        static void ImportASEFileBrowse()
+        private static void ImportASEFileBrowse()
         {
             var path = EditorUtility.OpenFilePanel("Swatchr Import", "", "ase");
             if (path != null && path != string.Empty)
@@ -95,7 +95,7 @@ namespace swatchr
         }
 
         [MenuItem("Assets/Swatchr/Import ASE Folder Into One Swatch (Browse...)")]
-        static void ImportASEFolderIntoOne()
+        private static void ImportASEFolderIntoOne()
         {
             var path = EditorUtility.OpenFolderPanel("Swatchr Import Folder", "", "");
             if (path != null && path != string.Empty)
@@ -122,7 +122,7 @@ namespace swatchr
         }
 
         [MenuItem("Assets/Swatchr/Import ASE Folder Into Seperate Swatches (Browse...)")]
-        static void ImportASEFolderIntoMany()
+        private static void ImportASEFolderIntoMany()
         {
             var path = EditorUtility.OpenFolderPanel("Swatchr Import Folder", "", "");
             if (path != null && path != string.Empty)
@@ -182,15 +182,17 @@ namespace swatchr
             return activeObject != null && activeObject is Swatch;
         }
 
-        static string GetSelectedSavePath(string title)
+        private static string GetSelectedSavePath(string title)
         {
             return AssetDatabase.GenerateUniqueAssetPath(GetSelectedPath() + "/" + title + ".asset");
         }
-        static string GetSelectedFileName()
+
+        private static string GetSelectedFileName()
         {
             return Path.GetFileNameWithoutExtension(AssetDatabase.GetAssetPath(Selection.activeObject));
         }
-        static string GetSelectedPath()
+
+        private static string GetSelectedPath()
         {
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             if (path == "")

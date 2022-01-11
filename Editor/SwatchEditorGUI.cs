@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+
 using UnityEditor;
+
+using UnityEngine;
 
 namespace swatchr
 {
@@ -33,7 +33,6 @@ namespace swatchr
 
                 if (swatch.numColors > 0)
                 {
-
                     var selectedColor = swatch.GetColor(colorRef);
                     int selectedColorRow = colorRef / SwatchrPaletteDrawer.itemsPerRow;
                     float selectedColorY = selectedColorRow * EditorGUIUtility.singleLineHeight + EditorGUIUtility.singleLineHeight;
@@ -208,10 +207,10 @@ namespace swatchr
             }
         }
 
-        string[] otherSwatchGUIDs;
-        string[] otherSwatchFilenames;
+        private string[] otherSwatchGUIDs;
+        private string[] otherSwatchFilenames;
 
-        void LoadOtherSwatches()
+        private void LoadOtherSwatches()
         {
             var swatchGUIDs = AssetDatabase.FindAssets("t:Swatch");
             var selfGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(target.GetInstanceID()));
@@ -233,7 +232,8 @@ namespace swatchr
             }
         }
 
-        static EditorWindow gameview;
+        private static EditorWindow gameview;
+
         public static void GameViewRepaint()
         {
             if (gameview == null)

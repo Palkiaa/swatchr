@@ -1,5 +1,5 @@
 // Copyright (c) 2013 Daniel Grunwald
-// 
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -8,10 +8,10 @@
 // copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 // OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -20,13 +20,6 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace SmartWeakEvent
 {
@@ -138,8 +131,6 @@ namespace SmartWeakEvent
     //		}
     //	}
 
-
-
     //	/// <summary>
     //	/// Removes dead entries from the handler list.
     //	/// You normally do not need to invoke this method manually, as dead entry removal runs automatically as part of the normal operation of the FastSmartWeakEvent.
@@ -193,7 +184,7 @@ namespace SmartWeakEvent
     //	/// Retrieves a delegate that can be used to raise the event.
     //	/// The delegate will contain a copy of the current invocation list. If handlers are added/removed from the event, GetRaiseDelegate() must be called
     //	/// again to retrieve a delegate that invokes the up-to-date invocation list.
-    //	/// 
+    //	///
     //	/// If the invocation list is empty, this method will return null.
     //	/// </summary>
     //	public T GetRaiseDelegate()

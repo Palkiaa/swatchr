@@ -1,6 +1,6 @@
 {
     "name": "swatchr.scripts",
-    "rootNamespace": "",
+    "rootNamespace": "swatchr",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -18,7 +18,7 @@ namespace swatchr
 
         public static Swatch CreateSwatchFromASEFile(SwatchASEFile aseFile, string projectSaveDestination)
         {
-            Swatch swatch = Swatch.FromSwatchASEFile(aseFile);
+            Swatch swatch = SwatchImporting.FromSwatchASEFile(aseFile);
 
             projectSaveDestination = AssetDatabase.GenerateUniqueAssetPath(projectSaveDestination);
             AssetDatabase.CreateAsset(swatch, projectSaveDestination);
@@ -171,8 +171,8 @@ namespace swatchr
             var selectedSwatch = (Swatch)Selection.activeObject;
             var assetLocation = GetSelectedPath() + "/" + GetSelectedFileName() + ".png";
             string saveLocation = ConvertAssetPathToFullPath(assetLocation);
-            SwatchrExportToTexture.ExportSwatchToTexture(selectedSwatch, saveLocation);
-            UnityEditor.AssetDatabase.ImportAsset(assetLocation);
+            selectedSwatch.ExportSwatchToTexture(saveLocation);
+            AssetDatabase.ImportAsset(assetLocation);
         }
 
         [MenuItem("Assets/Swatchr/Export Swatch To Texture", true)]

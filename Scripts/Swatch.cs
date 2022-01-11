@@ -70,60 +70,6 @@ namespace swatchr
             return colors[colorIndex];
         }
 
-        public static Swatch FromSwatchASEFile(SwatchASEFile file)
-        {
-            var swatchScriptableObject = ScriptableObject.CreateInstance<Swatch>();
-            swatchScriptableObject.colors = new Color[file.colors.Count];
-            for (int i = 0; i < swatchScriptableObject.colors.Length; i++)
-            {
-                swatchScriptableObject.colors[i] = new Color(file.colors[i].r, file.colors[i].g, file.colors[i].b);
-            }
-            return swatchScriptableObject;
-        }
-
-        public void AddColorsFromASEFile(SwatchASEFile file)
-        {
-            int initialLength = this.colors != null ? this.colors.Length : 0;
-            int fileLength = file.colors != null ? file.colors.Count : 0;
-            Array.Resize<Color>(ref this.colors, initialLength + fileLength);
-            int i = initialLength;
-            var iterator = file.colors.GetEnumerator();
-            while (iterator.MoveNext())
-            {
-                var fileColor = iterator.Current;
-                this.colors[i++] = new Color(fileColor.r, fileColor.g, fileColor.b);
-            }
-            SignalChange();
-        }
-
-        public void AddColorsFromOtherSwatch(Swatch otherSwatch)
-        {
-            int initialLength = this.colors != null ? this.colors.Length : 0;
-            int otherSwatchLength = otherSwatch.colors != null ? otherSwatch.colors.Length : 0;
-            Array.Resize<Color>(ref this.colors, initialLength + otherSwatchLength);
-            int i = initialLength;
-            for (int j = 0; j < otherSwatchLength; j++)
-            {
-                this.colors[i++] = otherSwatch.colors[j];
-            }
-            SignalChange();
-        }
-
-        public void ReplaceSelfWithOtherSwatch(Swatch otherSwatch)
-        {
-            if (otherSwatch.colors != null)
-            {
-                Array.Resize<Color>(ref colors, otherSwatch.colors.Length);
-                Array.Copy(otherSwatch.colors, colors, otherSwatch.colors.Length);
-            }
-            else
-            {
-                Array.Resize<Color>(ref colors, 0);
-            }
-
-            SignalChange();
-        }
-
         public void SignalChange()
         {
             RegenerateTexture();

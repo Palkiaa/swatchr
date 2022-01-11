@@ -2,6 +2,11 @@
 
 namespace swatchr
 {
+    public interface ISwatchrColorApplier
+    {
+        void ApplyColor();
+    }
+
     [ExecuteInEditMode]
     public abstract class SwatchrColorApplier : MonoBehaviour
     {

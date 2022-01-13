@@ -2,6 +2,8 @@ using System;
 
 using UnityEngine;
 
+using Guid = SerializableGuid;
+
 namespace swatchr
 {
     // SwatchrColor
@@ -33,7 +35,7 @@ namespace swatchr
         public void OnDisable()
         {
             if (_swatch != null)
-                _swatch.OnSwatchChanged -= OnSwatchChanged;
+                _swatch.OnChanged -= OnSwatchChanged;
         }
 
         private void OnSwatchChanged(object sender, EventArgs e)
@@ -48,21 +50,22 @@ namespace swatchr
             set
             {
                 if (_swatch != null)
-                    _swatch.OnSwatchChanged -= OnSwatchChanged;
+                    _swatch.OnChanged -= OnSwatchChanged;
                 _swatch = value;
+
                 if (_swatch != null)
-                    _swatch.OnSwatchChanged += OnSwatchChanged;
+                    _swatch.OnChanged += OnSwatchChanged;
                 if (OnColorChanged != null)
                     OnColorChanged();
             }
         }
 
-        public int colorIndex
+        public Guid colorId
         {
-            get { return _colorIndex; }
+            get { return _colorId; }
             set
             {
-                _colorIndex = value;
+                _colorId = value;
                 if (OnColorChanged != null) OnColorChanged();
             }
         }
@@ -71,11 +74,11 @@ namespace swatchr
         {
             get
             {
-                if (swatch == null || swatch.colors == null || swatch.colors.Length <= colorIndex || colorIndex < 0)
+                if (swatch != null && swatch.TryGetValue(colorId, out var color))
                 {
-                    return _overrideColor;
+                    return color;
                 }
-                return swatch.colors[colorIndex];
+                return _overrideColor;
             }
         }
 
@@ -83,7 +86,7 @@ namespace swatchr
         public Swatch _swatch;
 
         [SerializeField]
-        public int _colorIndex;
+        public Guid _colorId;
 
         [SerializeField]
         public Color _overrideColor;

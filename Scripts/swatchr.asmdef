@@ -1,11 +1,14 @@
 {
-    "name": "swatchr.scripts",
+    "name": "swatchr",
     "rootNamespace": "swatchr",
-    "references": [],
+    "references": [
+        "GUID:c85f41d4379abdb4eafe8f0f3fe7380b",
+        "GUID:c80069e02bbd5b9478436150910f0376"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
+    "overrideReferences": true,
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],

@@ -1,14 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
 
-namespace swatchr
+using UnityEngine;
+
+namespace swatchr.components
 {
-    public interface ISwatchrColorApplier
-    {
-        void ApplyColor();
-    }
 
     [ExecuteInEditMode]
-    public abstract class SwatchrColorApplier : MonoBehaviour
+    public abstract class SwatchrColorApplier : MonoBehaviour, ISwatchrColorApplier
     {
         public SwatchrColor swatchrColor;
 
@@ -32,6 +31,13 @@ namespace swatchr
             swatchrColor.OnEnable();
         }
 
+        public virtual IEnumerable<Guid> ColorsUsed()
+        {
+            return new Guid[] { swatchrColor.colorId };
+        }
+
         public abstract void Apply();
+
+
     }
 }

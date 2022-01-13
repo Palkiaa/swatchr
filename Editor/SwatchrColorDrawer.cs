@@ -1,8 +1,10 @@
+using System.Linq;
+
 using UnityEditor;
 
 using UnityEngine;
 
-namespace swatchr
+namespace swatchr.editor
 {
     [CustomPropertyDrawer(typeof(SwatchrColor))]
     public class SwatchrColorDrawer : PropertyDrawer
@@ -17,7 +19,7 @@ namespace swatchr
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             SwatchrColor swatchrColor = (SwatchrColor)fieldInfo.GetValue(property.serializedObject.targetObject);
-            Swatch swatch = swatchrColor.swatch;
+            var swatch = swatchrColor.swatch;
             Color color = swatchrColor.color;
             if (swatchTexture == null)
             {
@@ -27,9 +29,11 @@ namespace swatchr
                 swatchTexture = textureWithColor(color);
             }
 
-            var swatchProperty = property.FindPropertyRelative("_swatch");
-            var colorIndexProperty = property.FindPropertyRelative("_colorIndex");
-            var overrideColorProperty = property.FindPropertyRelative("_overrideColor");
+            var swatchProperty = property.FindPropertyRelative(nameof(SwatchrColor._swatch));
+            //var colorIndexProperty = property.FindPropertyRelative("_colorIndex");
+            var overrideColorProperty = property.FindPropertyRelative(nameof(SwatchrColor._overrideColor));
+
+            bool hasSwatch = swatch != null;
 
             position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
@@ -38,19 +42,19 @@ namespace swatchr
             var spacing = EditorGUIUtility.singleLineHeight * 0.5f;
             //var toggleSize				= EditorGUIUtility.singleLineHeight;
             var toggleSize = 0;
-            var swatchObjectPositionX = swatch == null ? position.x : position.x + swatchSize + keySize + toggleSize + spacing * 2;
+            var swatchObjectPositionX = !hasSwatch ? position.x : position.x + swatchSize + keySize + toggleSize + spacing * 2;
 
             //var swatchObjectWidth = swatch == null ? position.width : position.width - swatchSize - keySize - spacing * 2;
             var fullWidth = position.width - swatchObjectPositionX + position.x;
             float swatchObjectWidth = fullWidth;
             float colorWidth = 0.25f * fullWidth;
-            if (swatch == null)
+            if (!hasSwatch)
             {
                 swatchObjectWidth *= 0.75f;
             }
             var swatchObjectRect = new Rect(swatchObjectPositionX, position.y, swatchObjectWidth, EditorGUIUtility.singleLineHeight);
             var swatchRect = new Rect(position.x, position.y, swatchSize, EditorGUIUtility.singleLineHeight);
-            var colorIndexRect = new Rect(swatchRect.position.x + swatchRect.width + spacing, position.y, keySize, EditorGUIUtility.singleLineHeight);
+            //var colorIndexRect = new Rect(swatchRect.position.x + swatchRect.width + spacing, position.y, keySize, EditorGUIUtility.singleLineHeight);
             var colorField = new Rect(position.x + position.width - colorWidth, position.y, colorWidth, EditorGUIUtility.singleLineHeight);
 
             EditorGUI.BeginProperty(position, label, property);
@@ -68,24 +72,26 @@ namespace swatchr
                 UpdateActiveSwatch(swatchrColor.color);
             }
 
-            if (swatch != null)
+            if (hasSwatch)
             {
                 // Draw Color Field
                 if (DrawTextureButton(swatchTexture, swatchRect))
                 {
-                    paletteOpen = !paletteOpen && swatch != null && swatch.colors != null && swatch.colors.Length > 0;
+                    paletteOpen = !paletteOpen && hasSwatch && swatch.Count > 0;
                 }
                 DrawBlackGrid(swatchRect.x, swatchRect.y, 1, 1, (int)EditorGUIUtility.singleLineHeight);
 
                 // Draw Color index text field
-                EditorGUI.BeginChangeCheck();
-                EditorGUI.PropertyField(colorIndexRect, colorIndexProperty, GUIContent.none);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    property.serializedObject.ApplyModifiedProperties();
-                    swatchrColor.colorIndex = colorIndexProperty.intValue; // hack which calls observer pattern
-                    UpdateActiveSwatch(swatchrColor.color);
-                }
+
+                //EditorGUI.BeginChangeCheck();
+                //EditorGUI.PropertyField(colorIndexRect, colorIndexProperty, GUIContent.none);
+                //if (EditorGUI.EndChangeCheck())
+                //{
+                //    property.serializedObject.ApplyModifiedProperties();
+                //    //swatchrColor.colorId = colorIndexProperty.intValue; // hack which calls observer pattern
+                //    UpdateActiveSwatch(swatchrColor.color);
+                //}
+
                 // Draw Toggle
                 //EditorGUI.PropertyField(usingSwatchGroupToggleR, usingSwatchGroupProperty, GUIContent.none);
                 //usingSwatchGroupProperty.boolValue = EditorGUI.Toggle(usingSwatchGroupToggleR, usingSwatchGroupProperty.boolValue);
@@ -98,7 +104,7 @@ namespace swatchr
 #if SWATCHR_VERBOSE
 						Debug.LogWarning("[swatchrColorDrawer] creating pallete texture");
 #endif
-                        palleteTexture = textureWithColors(swatch.colors);
+                        palleteTexture = textureWithColors(swatch.Values.ToArray());
                         palleteTextureCachedHash = swatchHash;
                     }
                     var textureRect = new Rect(swatchRect.x, swatchRect.y + EditorGUIUtility.singleLineHeight + 3, palleteTexture.width * EditorGUIUtility.singleLineHeight, palleteTexture.height * EditorGUIUtility.singleLineHeight);
@@ -113,9 +119,11 @@ namespace swatchr
                         int cellXIndex = (int)(rectClickPosition.x / EditorGUIUtility.singleLineHeight);
                         int cellYIndex = (int)(rectClickPosition.y / EditorGUIUtility.singleLineHeight);
                         int colorIndex = cellYIndex * palleteTexture.width + cellXIndex;
-                        colorIndexProperty.intValue = colorIndex;
+
+                        swatchrColor.colorId = swatch.Keys.ElementAt(colorIndex);
+                        //colorIndexProperty.intValue = colorIndex;
                         property.serializedObject.ApplyModifiedProperties();
-                        swatchrColor.colorIndex = colorIndex; //  calls observer pattern
+                        //swatchrColor.colorId = colorIndex; //  calls observer pattern
                         UpdateActiveSwatch(swatchrColor.color);
                     }
                     else if (IsClick())
@@ -132,7 +140,7 @@ namespace swatchr
                 if (EditorGUI.EndChangeCheck())
                 {
                     property.serializedObject.ApplyModifiedProperties();
-                    swatchrColor.colorIndex = colorIndexProperty.intValue; // hack which calls observer pattern
+                    //swatchrColor.colorId = colorIndexProperty.intValue; // hack which calls observer pattern
                 }
             }
             // Set indent back to what it was
@@ -166,7 +174,7 @@ namespace swatchr
         {
             int itemsPerRow = 5;
             // figure out our texture size based on the itemsPerRow and color count
-            int totalRows = Mathf.CeilToInt((float)colors.Length / (float)itemsPerRow);
+            int totalRows = Mathf.CeilToInt(colors.Length / (float)itemsPerRow);
             var tex = new Texture2D(itemsPerRow, totalRows, TextureFormat.RGBA32, false, true);
             tex.filterMode = FilterMode.Point;
             tex.wrapMode = TextureWrapMode.Clamp;

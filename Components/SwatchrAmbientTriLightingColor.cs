@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace swatchr
+namespace swatchr.components
 {
     [ExecuteInEditMode]
     public class SwatchrAmbientTriLightingColor : MonoBehaviour

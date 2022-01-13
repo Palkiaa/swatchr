@@ -1,8 +1,11 @@
+using System;
+using System.Linq;
+
 using UnityEditor;
 
 using UnityEngine;
 
-namespace swatchr
+namespace swatchr.editor
 {
     public class SwatchrPaletteDrawer
     {
@@ -12,7 +15,7 @@ namespace swatchr
 
         public const int itemsPerRow = 8;
 
-        public static bool DrawColorPallete(Swatch swatch, ref int colorKey, bool drawNewColorButton)
+        public static bool DrawColorPallete(Swatch swatch, ref Guid colorKey, bool drawNewColorButton)
         {
             if (swatch == null)
             {
@@ -21,7 +24,7 @@ namespace swatchr
 
             var lastRect = GUILayoutUtility.GetLastRect();
 
-            if (swatch.colors != null && swatch.colors.Length > 0)
+            if (0 < swatch.Count)
             {
                 int swatchHash = swatch.cachedTexture.GetHashCode();
                 if (palleteTexture == null || palleteTextureCachedHashCode != swatchHash)
@@ -29,16 +32,16 @@ namespace swatchr
                     if (palleteTexture == null)
                     {
 #if SWATCHR_VERBOSE
-						Debug.LogWarning("[SwatchrPalleteDrawer] creating pallete texture because there is none");
+                        Debug.LogWarning("[SwatchrPalleteDrawer] creating pallete texture because there is none");
 #endif
                     }
                     else
                     {
 #if SWATCHR_VERBOSE
-						Debug.LogWarningFormat("[SwatchrPalleteDrawer] creating pallete texture because cache miss. {0} != {1}", palleteTextureCachedHashCode, swatchHash);
+                        Debug.LogWarningFormat("[SwatchrPalleteDrawer] creating pallete texture because cache miss. {0} != {1}", palleteTextureCachedHashCode, swatchHash);
 #endif
                     }
-                    palleteTexture = textureWithColors(swatch.colors);
+                    palleteTexture = textureWithColors(swatch.Values.ToArray());
                     palleteTextureCachedHashCode = swatchHash;
                 }
             }
@@ -50,19 +53,19 @@ namespace swatchr
             if (blackTexture == null)
             {
 #if SWATCHR_VERBOSE
-				Debug.LogWarning("[SwatchrPalleteDrawer] creating black texture");
+                Debug.LogWarning("[SwatchrPalleteDrawer] creating black texture");
 #endif
                 blackTexture = textureWithColor(Color.black);
             }
             if (whiteTexture == null)
             {
 #if SWATCHR_VERBOSE
-				Debug.LogWarning("[SwatchrPalleteDrawer] creating white texture");
+                Debug.LogWarning("[SwatchrPalleteDrawer] creating white texture");
 #endif
                 whiteTexture = textureWithColor(Color.white);
             }
 
-            int numColors = swatch.colors != null ? swatch.colors.Length : 0;
+            int numColors = swatch.Count;
             int numPerRow = itemsPerRow;
             int numInBottomRow = numColors % numPerRow;
 
@@ -80,7 +83,7 @@ namespace swatchr
             }
 
             Rect clickRect = textureRect;
-            if (swatch.colors == null || swatch.colors.Length == 0)
+            if (swatch.Count == 0)
             {
                 clickRect.width = EditorGUIUtility.singleLineHeight;
             }
@@ -90,7 +93,7 @@ namespace swatchr
             if (palleteTexture != null)
             {
                 DrawTexture(palleteTexture, textureRect);
-                DrawBlackGrid(textureRect.x, textureRect.y, swatch.colors.Length, palleteTexture.width, palleteTexture.height, (int)EditorGUIUtility.singleLineHeight, blackTexture);
+                DrawBlackGrid(textureRect.x, textureRect.y, swatch.Count, palleteTexture.width, palleteTexture.height, (int)EditorGUIUtility.singleLineHeight, blackTexture);
             }
 
             if (drawNewColorButton)
@@ -111,14 +114,14 @@ namespace swatchr
                     int clickedOnKey = cellYIndex * textureWidth + cellXIndex;
                     if (numColors > 0 && clickedOnKey < numColors)
                     {
-                        colorKey = clickedOnKey;
+                        colorKey = swatch.ElementAt(clickedOnKey).Key;
                         somethingHasChanged = true;
                     }
                     else if (clickedOnKey == numColors)
                     {
-                        colorKey = clickedOnKey;
-                        System.Array.Resize(ref swatch.colors, numColors + 1);
-                        swatch.colors[colorKey] = Color.white;
+                        colorKey = Guid.NewGuid();
+                        //System.Array.Resize(ref swatch.oldColors, numColors + 1);
+                        swatch.Add(colorKey, Color.white);
                         swatch.SignalChange();
                         somethingHasChanged = true;
                     }
@@ -128,10 +131,11 @@ namespace swatchr
                 }
             }
 
-            if (swatch.colors != null && swatch.colors.Length > 0)
+            if (0 < swatch.Count && swatch.ContainsKey(colorKey))
             {
-                DrawOnSelectedCell(colorKey, textureRect);
-                int selectedColorRow = colorKey / SwatchrPaletteDrawer.itemsPerRow;
+                int colorIndex = swatch.Keys.ToList().IndexOf(colorKey);
+                DrawOnSelectedCell(colorIndex, textureRect);
+                int selectedColorRow = colorIndex / SwatchrPaletteDrawer.itemsPerRow;
                 float selectedColorY = selectedColorRow * EditorGUIUtility.singleLineHeight + EditorGUIUtility.singleLineHeight;
                 var colorKeyRect = new Rect(lastRect.x + SwatchrPaletteDrawer.itemsPerRow * EditorGUIUtility.singleLineHeight, lastRect.y + selectedColorY, 64, EditorGUIUtility.singleLineHeight);
                 EditorGUI.LabelField(colorKeyRect, colorKey.ToString());
@@ -171,7 +175,7 @@ namespace swatchr
 
         public static Rect GetNewColorButtonRect(Swatch swatch)
         {
-            int numColors = swatch.colors.Length;
+            int numColors = swatch.Count;
             int totalRows = Mathf.CeilToInt(numColors / (float)itemsPerRow);
             int numInBottomRow = numColors % itemsPerRow;
             Rect r = new Rect();

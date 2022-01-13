@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace swatchr
+namespace swatchr.components
 {
     [RequireComponent(typeof(Camera))]
     public class SwatchrCameraColor : SwatchrColorApplier

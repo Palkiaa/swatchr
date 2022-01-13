@@ -1,13 +1,11 @@
 {
-    "name": "swatchr.editor",
-    "rootNamespace": "swatchr.editor",
+    "name": "swatchr.components",
+    "rootNamespace": "swatchr.components",
     "references": [
         "GUID:1d324f2e26cedc74695ff662cb2eb505",
         "GUID:c85f41d4379abdb4eafe8f0f3fe7380b"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,

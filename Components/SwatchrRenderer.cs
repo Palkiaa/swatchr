@@ -3,7 +3,7 @@
 // SwatchrRenderer
 //  Applies a SwatchrColor in OnEnable to the connected Renderer's material.
 //  Does this by setting "_Color" on the renderer's Material Property Block
-namespace swatchr
+namespace swatchr.components
 {
     [RequireComponent(typeof(Renderer))]
     public class SwatchrRenderer : SwatchrColorApplier

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 using UnityEditor;
 
 using UnityEngine;
 
-namespace swatchr
+namespace swatchr.editor
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(Swatch))]
@@ -15,26 +16,28 @@ namespace swatchr
         private bool replace;
         private Swatch mergeObject;
         private Swatch replaceObject;
-        private int colorRef;
+        private Guid colorId;
 
         public override void OnInspectorGUI()
         {
             Swatch swatch = (Swatch)target;
+
 
             // Swatch
             {
                 EditorGUILayout.LabelField("Swatch", EditorStyles.boldLabel);
                 // if (swatch.colors != null && swatch.colors.Length > 0) {
                 var startingRect = GUILayoutUtility.GetLastRect();
-                if (SwatchrPaletteDrawer.DrawColorPallete(swatch, ref colorRef, true))
+                if (SwatchrPaletteDrawer.DrawColorPallete(swatch, ref colorId, true))
                 {
                     Repaint();
                 }
 
-                if (swatch.numColors > 0)
+                if (0 < swatch.Count && swatch.ContainsKey(colorId))
                 {
-                    var selectedColor = swatch.GetColor(colorRef);
-                    int selectedColorRow = colorRef / SwatchrPaletteDrawer.itemsPerRow;
+                    int colorIndex = swatch.Keys.ToList().IndexOf(colorId);
+                    var selectedColor = swatch[colorId];
+                    int selectedColorRow = colorIndex / SwatchrPaletteDrawer.itemsPerRow;
                     float selectedColorY = selectedColorRow * EditorGUIUtility.singleLineHeight + EditorGUIUtility.singleLineHeight;
                     // EditorGUI.LabelField(colorKeyRect, ""+colorRef);
                     var changeColorRect = new Rect(startingRect.x + SwatchrPaletteDrawer.itemsPerRow * EditorGUIUtility.singleLineHeight + 30, startingRect.y + selectedColorY, 64, EditorGUIUtility.singleLineHeight);
@@ -43,7 +46,7 @@ namespace swatchr
                     var newColor = EditorGUI.ColorField(changeColorRect, selectedColor);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        swatch.colors[colorRef] = newColor;
+                        swatch[colorId] = newColor;
                         swatch.SignalChange();
                         GameViewRepaint();
                     }
@@ -51,21 +54,18 @@ namespace swatchr
                     int y = (int)(changeColorRect.y + changeColorRect.height - EditorGUIUtility.singleLineHeight);
                     if (SwatchrPaletteDrawer.DrawDeleteButton(x, y))
                     {
-                        if (colorRef + 1 < swatch.colors.Length)
+                        if (swatch.Remove(colorId))
                         {
-                            Array.Copy(swatch.colors, colorRef + 1, swatch.colors, colorRef, swatch.colors.Length - colorRef - 1);
-                        }
-                        Array.Resize<Color>(ref swatch.colors, swatch.colors.Length - 1);
-                        if (colorRef >= swatch.colors.Length)
-                        {
-                            colorRef = swatch.colors.Length - 1;
-                            if (colorRef < 0)
+                            if (colorIndex >= swatch.Count)
                             {
-                                colorRef = 0;
+                                colorIndex = swatch.Count - 1;
+                                if (colorIndex < 0)
+                                    colorIndex = 0;
                             }
+                            colorId = swatch.Keys.ElementAt(colorIndex);
+                            swatch.SignalChange();
+                            GameViewRepaint();
                         }
-                        swatch.SignalChange();
-                        GameViewRepaint();
                     }
                 }
                 //}
@@ -81,7 +81,7 @@ namespace swatchr
                     {
                         Debug.Log("[SwatchEditorGUI] path " + path);
                         SwatchASEFile aseFile = new SwatchASEFile(path);
-                        swatch.AddColorsFromASEFile(aseFile);
+                        //swatch.AddColorsFromASEFile(aseFile);
                         GameViewRepaint();
                     }
                 }
@@ -99,7 +99,7 @@ namespace swatchr
                             if (file.EndsWith(".ase"))
                             {
                                 SwatchASEFile aseFile = new SwatchASEFile(file);
-                                swatch.AddColorsFromASEFile(aseFile);
+                                //swatch.AddColorsFromASEFile(aseFile);
                                 GameViewRepaint();
                             }
                         }
@@ -119,12 +119,10 @@ namespace swatchr
                         var pixels = tex.GetPixels();
                         if (pixels != null && pixels.Length > 0)
                         {
-                            //int i = swatch.colors.Length;
-                            int i = 0;
-                            Array.Resize<Color>(ref swatch.colors, pixels.Length);
-                            for (int j = 0; j < pixels.Length; j++)
+                            swatch.Clear();
+                            for (int i = 0; i < pixels.Length; i++)
                             {
-                                swatch.colors[i++] = pixels[j];
+                                swatch.Add(Guid.NewGuid(), pixels[i]);
                             }
                             swatch.SignalChange();
                             GameViewRepaint();

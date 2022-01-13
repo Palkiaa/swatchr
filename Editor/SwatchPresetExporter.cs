@@ -4,7 +4,7 @@ using UnityEditor;
 
 using UnityEngine;
 
-namespace swatchr
+namespace swatchr.editor
 {
     // SwatchPresetExporter
     // This class exports a swatch to the unity color picker.
@@ -34,9 +34,10 @@ namespace swatchr
             var libraryProjectpath = libraryDirectory + "/" + swatch.name + ".colors";
             var fullFileName = libraryProjectpath.Replace("Assets", Application.dataPath);
             string fileText = COLORS_TEMPLATE;
-            for (int i = 0; i < swatch.colors.Length; i++)
+
+            foreach (var color in swatch)
             {
-                fileText += GetYAMLForColor(swatch.colors[i]);
+                fileText += GetYAMLForColor(color.Value);
             }
             Debug.Log("[SwatchPresetExporter] writing to " + fullFileName);
             File.WriteAllText(fullFileName, fileText);

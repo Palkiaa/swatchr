@@ -4,7 +4,7 @@ using UnityEditor;
 
 using UnityEngine;
 
-namespace swatchr
+namespace swatchr.editor
 {
     public static class SwatchCreator
     {
@@ -153,14 +153,14 @@ namespace swatchr
                 var pixels = tex.GetPixels();
                 if (pixels != null && pixels.Length > 0)
                 {
-                    var swatch = ScriptableObject.CreateInstance<Swatch>();
-                    System.Array.Resize<Color>(ref swatch.colors, pixels.Length);
-                    for (int j = 0; j < pixels.Length; j++)
-                    {
-                        swatch.colors[j] = pixels[j];
-                    }
-                    ProjectWindowUtil.CreateAsset(swatch, "New Swatch.asset");
-                    AssetDatabase.SaveAssets();
+                    //var swatch = ScriptableObject.CreateInstance<Swatch>();
+                    //System.Array.Resize<Color>(ref swatch.oldColors, pixels.Length);
+                    //for (int j = 0; j < pixels.Length; j++)
+                    //{
+                    //    swatch.oldColors[j] = pixels[j];
+                    //}
+                    //ProjectWindowUtil.CreateAsset(swatch, "New Swatch.asset");
+                    //AssetDatabase.SaveAssets();
                 }
             }
         }

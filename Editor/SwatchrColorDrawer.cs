@@ -13,7 +13,6 @@ namespace swatchr.editor
         private Texture2D palleteTexture;
         private int palleteTextureCachedHash;
         private Texture2D blackTexture;
-
         private bool paletteOpen;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -24,7 +23,7 @@ namespace swatchr.editor
             if (swatchTexture == null)
             {
 #if SWATCHR_VERBOSE
-				Debug.LogWarning("[swatchrColorDrawer] creating swatch texture");
+                Debug.LogWarning("[swatchrColorDrawer] creating swatch texture");
 #endif
                 swatchTexture = textureWithColor(color);
             }
@@ -40,10 +39,9 @@ namespace swatchr.editor
             var swatchSize = EditorGUIUtility.singleLineHeight;
             var keySize = EditorGUIUtility.singleLineHeight * 1.25f;
             var spacing = EditorGUIUtility.singleLineHeight * 0.5f;
-            //var toggleSize				= EditorGUIUtility.singleLineHeight;
+            //var toggleSize = EditorGUIUtility.singleLineHeight;
             var toggleSize = 0;
-            var swatchObjectPositionX = !hasSwatch ? position.x : position.x + swatchSize + keySize + toggleSize + spacing * 2;
-
+            var swatchObjectPositionX = swatch == null ? position.x : position.x + spacing;// + keySize + toggleSize + spacing * 2;
             //var swatchObjectWidth = swatch == null ? position.width : position.width - swatchSize - keySize - spacing * 2;
             var fullWidth = position.width - swatchObjectPositionX + position.x;
             float swatchObjectWidth = fullWidth;
@@ -55,23 +53,33 @@ namespace swatchr.editor
             var swatchObjectRect = new Rect(swatchObjectPositionX, position.y, swatchObjectWidth, EditorGUIUtility.singleLineHeight);
             var swatchRect = new Rect(position.x, position.y, swatchSize, EditorGUIUtility.singleLineHeight);
             //var colorIndexRect = new Rect(swatchRect.position.x + swatchRect.width + spacing, position.y, keySize, EditorGUIUtility.singleLineHeight);
+
+            //var colorIdRect = new Rect(swatchRect.position.x + swatchRect.width + spacing, position.y, keySize, EditorGUIUtility.singleLineHeight);
             var colorField = new Rect(position.x + position.width - colorWidth, position.y, colorWidth, EditorGUIUtility.singleLineHeight);
+            bool selectingColor = swatch != null;// && swatch.Palette.ContainsKey(swatchrColor.ColorId);
 
+            if (!selectingColor)
+            {
+                swatchObjectRect.x = position.x;
+                swatchObjectRect.width = fullWidth - colorField.width - spacing;
+            }
+            else
+            {
+                swatchObjectRect.x = position.x + swatchRect.width + spacing;
+                swatchObjectRect.width = fullWidth - swatchRect.width;// - swatchObjectRect.x;
+            }
             EditorGUI.BeginProperty(position, label, property);
-
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
-
             // Draw Swatch object
             EditorGUI.BeginChangeCheck();
             EditorGUI.PropertyField(swatchObjectRect, swatchProperty, GUIContent.none);
             if (EditorGUI.EndChangeCheck())
             {
                 property.serializedObject.ApplyModifiedProperties();
-                swatchrColor.swatch = swatchrColor._swatch; // hack which calls observer pattern
+                //swatchrColor.swatch = swatchrColor._swatch; // hack which calls observer pattern
                 UpdateActiveSwatch(swatchrColor.color);
             }
-
             if (hasSwatch)
             {
                 // Draw Color Field
@@ -80,9 +88,7 @@ namespace swatchr.editor
                     paletteOpen = !paletteOpen && hasSwatch && swatch.Count > 0;
                 }
                 DrawBlackGrid(swatchRect.x, swatchRect.y, 1, 1, (int)EditorGUIUtility.singleLineHeight);
-
                 // Draw Color index text field
-
                 //EditorGUI.BeginChangeCheck();
                 //EditorGUI.PropertyField(colorIndexRect, colorIndexProperty, GUIContent.none);
                 //if (EditorGUI.EndChangeCheck())
@@ -90,12 +96,9 @@ namespace swatchr.editor
                 //    property.serializedObject.ApplyModifiedProperties();
                 //    //swatchrColor.colorId = colorIndexProperty.intValue; // hack which calls observer pattern
                 //    UpdateActiveSwatch(swatchrColor.color);
-                //}
-
-                // Draw Toggle
+                //}// Draw Toggle
                 //EditorGUI.PropertyField(usingSwatchGroupToggleR, usingSwatchGroupProperty, GUIContent.none);
                 //usingSwatchGroupProperty.boolValue = EditorGUI.Toggle(usingSwatchGroupToggleR, usingSwatchGroupProperty.boolValue);
-
                 if (paletteOpen)
                 {
                     int swatchHash = swatch.cachedTexture.GetHashCode();
@@ -110,7 +113,6 @@ namespace swatchr.editor
                     var textureRect = new Rect(swatchRect.x, swatchRect.y + EditorGUIUtility.singleLineHeight + 3, palleteTexture.width * EditorGUIUtility.singleLineHeight, palleteTexture.height * EditorGUIUtility.singleLineHeight);
                     DrawTexture(palleteTexture, textureRect);
                     DrawBlackGrid(textureRect.x, textureRect.y, palleteTexture.width, palleteTexture.height, (int)EditorGUIUtility.singleLineHeight);
-
                     // listen to click
                     Event e = Event.current;
                     if (IsClickInRect(textureRect))
@@ -119,7 +121,6 @@ namespace swatchr.editor
                         int cellXIndex = (int)(rectClickPosition.x / EditorGUIUtility.singleLineHeight);
                         int cellYIndex = (int)(rectClickPosition.y / EditorGUIUtility.singleLineHeight);
                         int colorIndex = cellYIndex * palleteTexture.width + cellXIndex;
-
                         swatchrColor.colorId = swatch.Keys.ElementAt(colorIndex);
                         //colorIndexProperty.intValue = colorIndex;
                         property.serializedObject.ApplyModifiedProperties();
@@ -191,9 +192,7 @@ namespace swatchr.editor
             {
                 tex.SetPixel(x, y, Color.clear);
             }
-
             tex.Apply();
-
             return tex;
         }
 
@@ -206,7 +205,6 @@ namespace swatchr.editor
 #endif
                 blackTexture = textureWithColor(Color.black);
             }
-
             // draw vertical lines
             Rect currentRect = new Rect(startingPointX, startingPointY, 1, cellSize * cellsY);
             for (int i = 0; i <= cellsX; i++)
@@ -214,11 +212,9 @@ namespace swatchr.editor
                 currentRect.x = startingPointX + cellSize * i;
                 DrawTexture(blackTexture, currentRect);
             }
-
             currentRect.x = startingPointX;
             currentRect.height = 1;
             currentRect.width = cellSize * cellsX;
-
             for (int i = 0; i <= cellsY; i++)
             {
                 currentRect.y = startingPointY + cellSize * i;

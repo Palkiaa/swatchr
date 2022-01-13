@@ -40,8 +40,7 @@ namespace swatchr
 
         private void OnSwatchChanged(object sender, EventArgs e)
         {
-            if (OnColorChanged != null)
-                OnColorChanged();
+            OnColorChanged?.Invoke();
         }
 
         public Swatch swatch
@@ -66,7 +65,7 @@ namespace swatchr
             set
             {
                 _colorId = value;
-                if (OnColorChanged != null) OnColorChanged();
+                OnColorChanged?.Invoke();
             }
         }
 

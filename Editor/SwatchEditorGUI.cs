@@ -166,9 +166,16 @@ namespace swatchr.editor
                     mergeObject = (Swatch)EditorGUILayout.ObjectField(mergeObject, typeof(Swatch), false);
                     // Confirm
                     EditorGUI.BeginDisabledGroup(mergeObject == null);
-                    if (GUILayout.Button("Merge"))
+                    if (GUILayout.Button("Append"))
                     {
-                        swatch.AddColorsFromOtherSwatch(mergeObject);
+                        swatch.AddColorsFromOtherSwatch(mergeObject, false);
+                        GameViewRepaint();
+                        mergeObject = null;
+                        merge = false;
+                    }
+                    if (GUILayout.Button("Append and Replace"))
+                    {
+                        swatch.AddColorsFromOtherSwatch(mergeObject, true);
                         GameViewRepaint();
                         mergeObject = null;
                         merge = false;
